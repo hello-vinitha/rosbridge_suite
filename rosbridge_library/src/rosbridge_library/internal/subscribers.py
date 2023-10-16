@@ -138,6 +138,8 @@ class MultiSubscriber:
 
     def unregister(self):
         self.node_handle.destroy_subscription(self.subscriber)
+        if self.new_subscriber:
+            self.node_handle.destroy_subscription(self.new_subscriber)
         with self.lock:
             self.subscriptions.clear()
 
@@ -192,9 +194,9 @@ class MultiSubscriber:
     def has_subscribers(self):
         """Return true if there are subscribers"""
         with self.lock:
-            return len(self.subscriptions) != 0
+            return len(self.subscriptions) + len(self.new_subscriptions) != 0
 
-    def callback(self, msg, callbacks=None):
+    def callback(self, msg):
         """Callback for incoming messages on the rclpy subscription.
 
         Passes the message to registered subscriber callbacks.
@@ -207,9 +209,8 @@ class MultiSubscriber:
         outgoing = OutgoingMessage(msg)
 
         # Get the callbacks to call
-        if not callbacks:
-            with self.lock:
-                callbacks = self.subscriptions.values()
+        with self.lock:
+            callbacks = self.subscriptions.values()
 
         # Pass the JSON to each of the callbacks
         for callback in callbacks:
@@ -231,7 +232,6 @@ class MultiSubscriber:
         subscriptors.
         """
         with self.lock:
-            self.callback(msg, self.new_subscriptions.values())
             self.subscriptions.update(self.new_subscriptions)
             self.new_subscriptions = {}
             self.node_handle.destroy_subscription(self.new_subscriber)

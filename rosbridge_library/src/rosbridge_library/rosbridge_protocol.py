@@ -30,9 +30,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# imports for external service_server
 from rosbridge_library.capabilities.action_client import ActionClientRequests
 from rosbridge_library.capabilities.advertise import Advertise
+
+# imports for external service_server
 from rosbridge_library.capabilities.advertise_service import AdvertiseService
 from rosbridge_library.capabilities.call_service import CallService
 
@@ -57,7 +58,7 @@ class RosbridgeProtocol(Protocol):
         AdvertiseService,
         ServiceResponse,
         UnadvertiseService,
-        ActionClientRequests,
+        ActionClientRequests
     ]
 
     print("registered capabilities (classes):")

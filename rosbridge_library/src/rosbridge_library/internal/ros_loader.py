@@ -49,7 +49,6 @@ _msgs_lock = Lock()
 _srvs_lock = Lock()
 _actions_lock = Lock()
 
-
 class InvalidTypeStringException(Exception):
     def __init__(self, typestring):
         Exception.__init__(self, "%s is not a valid type string" % typestring)
@@ -86,13 +85,11 @@ def get_service_class(typestring):
     Returns the loaded class, or None on failure"""
     return _get_srv_class(typestring)
 
-
 def get_action_class(typestring):
     """Loads the action type specified.
-
+    
     Returns the loaded class, or throws exceptions on failure"""
     return _get_action_class(typestring)
-
 
 def get_message_instance(typestring):
     """If not loaded, loads the specified type.
@@ -100,31 +97,25 @@ def get_message_instance(typestring):
     cls = get_message_class(typestring)
     return cls()
 
-
 def get_service_request_instance(typestring):
     cls = get_service_class(typestring)
     return cls.Request()
-
 
 def get_service_response_instance(typestring):
     cls = get_service_class(typestring)
     return cls.Response()
 
-
 def get_action_goal_instance(typestring):
     cls = get_action_class(typestring)
     return cls.Goal()
-
 
 def get_action_feedback_instance(typestring):
     cls = get_action_class(typestring)
     return cls.Feedback()
 
-
 def get_action_result_instance(typestring):
     cls = get_action_class(typestring)
     return cls.Result()
-
 
 def _get_msg_class(typestring):
     """If not loaded, loads the specified msg class then returns an instance
@@ -169,18 +160,16 @@ def _get_srv_class(typestring):
     except (InvalidModuleException, InvalidClassException):
         return _get_class(typestring, subname, _loaded_srvs, _srvs_lock)
 
-
 def _get_action_class(typestring):
     """If not loaded, loads the specified action class then returns an instance
     of it
-
     Throws various exceptions if loading the action class fails"""
     global _loaded_actions, _actions_lock
     try:
         # The type string starts with the package and ends with the
         # class and contains module subnames in between. For
         # compatibility with ROS1 style types, we fall back to use a
-        # standard "srv" subname.
+        # standard "action" subname.
         splits = [x for x in typestring.split("/") if x]
         if len(splits) > 2:
             subname = ".".join(splits[1:-1])
@@ -190,8 +179,7 @@ def _get_action_class(typestring):
         return _get_class(typestring, subname, _loaded_actions, _actions_lock)
     except (InvalidModuleException, InvalidClassException):
         return _get_class(typestring, subname, _loaded_actions, _actions_lock)
-
-
+        
 def _get_class(typestring, subname, cache, lock):
     """If not loaded, loads the specified class then returns an instance
     of it.

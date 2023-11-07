@@ -1,6 +1,7 @@
 from threading import Thread
 
 import rclpy
+from rclpy.task import Future
 from action_msgs.msg import GoalStatus
 from action_msgs.srv import CancelGoal
 from rclpy.action import ActionClient
@@ -121,6 +122,16 @@ class GoalHandle(Thread):
         # Populate the provided instance, propagating any exceptions
         populate_instance(msg, inst)
 
+    def get_result_cb(self, future: Future) -> None:
+        self.result = future.result()
+
+    def goal_response_cb(self, future: Future) -> None:
+        self.goal_handle = future.result()
+        if not self.goal_handle.accepted:
+            raise Exception("Action goal was rejected")
+        result_future = self.goal_handle.get_result_async()
+        result_future.add_done_callback(self.get_result_cb)
+        
     def start_goal(self, goal_msg):
         if not self.client.action_client.wait_for_server(timeout_sec=10.0):
             self.client.node_handle.get_logger().warning(
@@ -133,18 +144,26 @@ class GoalHandle(Thread):
         self.args_to_action_goal_instance(inst, goal_msg)
 
         # send the goal and wait for the goal future to be accepted
+        self.result = None
         send_goal_future = self.client.action_client.send_goal_async(inst, self.feedback)
-        rclpy.spin_until_future_complete(self.client.node_handle, send_goal_future)
+        send_goal_future.add_done_callback(self.goal_response_cb)
+
+        while self.result is None:
+            time.sleep(0.001)
+
+        # rclpy.spin_until_future_complete(self.client.node_handle, send_goal_future)
         goal_handle = send_goal_future.result()
-        if not goal_handle.accepted:
-            raise Exception("Action Goal was rejected!")
+        # if not goal_handle.accepted:
+        #     raise Exception("Action Goal was rejected!")
         self.client.node_handle.get_logger().info(
             f"Goal is accepted by the action server: {self.client.action_name}."
         )
 
         # get the result
         result = goal_handle.get_result()
-
+        self.client.node_handle.get_logger().info(
+            f"result..."
+        )
         # return the result of the goal if succeeded.
         status = result.status
         if status == GoalStatus.STATUS_SUCCEEDED:

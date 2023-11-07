@@ -2,6 +2,23 @@
 Changelog for package rosbridge_library
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.2 (2023-09-27)
+------------------
+* Interpret call_services_in_new_thread as boolean (`#857 <https://github.com/RobotWebTools/rosbridge_suite/issues/857>`_)
+* Add option to call services in a separate thread (`#847 <https://github.com/RobotWebTools/rosbridge_suite/issues/847>`_)
+* fix memory leak on service call (`#774 <https://github.com/RobotWebTools/rosbridge_suite/issues/774>`_)
+* Contributors: Sebastian Castro, hiroyuki obinata, rwhitney456
+
+1.3.1 (2022-10-21)
+------------------
+* Optimized large binary array publishing (`#819 <https://github.com/RobotWebTools/rosbridge_suite/issues/819>`_)
+* Skip unnecessary conversion for cbor/cbor-raw compression (`#792 <https://github.com/RobotWebTools/rosbridge_suite/issues/792>`_) (`#800 <https://github.com/RobotWebTools/rosbridge_suite/issues/800>`_)
+* Improve robustness for multiple client connections (`#803 <https://github.com/RobotWebTools/rosbridge_suite/issues/803>`_)
+* Minor performance improvements (`#809 <https://github.com/RobotWebTools/rosbridge_suite/issues/809>`_)
+* Remove unnecessary checking of topic globs. (`#793 <https://github.com/RobotWebTools/rosbridge_suite/issues/793>`_) (`#799 <https://github.com/RobotWebTools/rosbridge_suite/issues/799>`_)
+* Fix duplicate subscription created with wrong 'raw' attribute. (`#798 <https://github.com/RobotWebTools/rosbridge_suite/issues/798>`_)
+* Contributors: Hans-Joachim Krauch, Steffen Nattke, Ted Sender
+
 1.3.0 (2022-08-16)
 ------------------
 * Allow integers in conversion to float array messages (`#777 <https://github.com/RobotWebTools/rosbridge_suite/issues/777>`_)

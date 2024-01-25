@@ -127,10 +127,9 @@ class GoalHandle(Thread):
 
     def goal_response_cb(self, future: Future) -> None:
         self.goal_handle = future.result()
-        if not self.goal_handle.accepted:
-            raise Exception("Action goal was rejected")
-        result_future = self.goal_handle.get_result_async()
-        result_future.add_done_callback(self.get_result_cb)
+        if self.goal_handle.accepted:
+            result_future = self.goal_handle.get_result_async()
+            result_future.add_done_callback(self.get_result_cb)
         
     def start_goal(self, goal_msg):
         if not self.client.action_client.wait_for_server(timeout_sec=10.0):

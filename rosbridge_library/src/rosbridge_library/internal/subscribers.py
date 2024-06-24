@@ -35,6 +35,7 @@ from threading import Lock, RLock
 
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
+from rclpy.time import Time
 from rosbridge_library.internal import ros_loader
 from rosbridge_library.internal.message_conversion import msg_class_type_repr
 from rosbridge_library.internal.outgoing_message import OutgoingMessage
@@ -110,7 +111,7 @@ class MultiSubscriber:
         # - https://docs.ros.org/en/rolling/Concepts/About-Quality-of-Service-Settings.html
         # - https://github.com/RobotWebTools/rosbridge_suite/issues/551
         qos = QoSProfile(
-            depth=10,
+            depth=1,
             durability=DurabilityPolicy.VOLATILE,
             reliability=ReliabilityPolicy.RELIABLE,
         )
@@ -204,7 +205,7 @@ class MultiSubscriber:
         with self.rlock:
             return len(self.subscriptions) + len(self.new_subscriptions) != 0
 
-    def callback(self, msg, callbacks=None):
+    def callback(self, msg, callbacks=None, verbose=False):
         """Callback for incoming messages on the rclpy subscription.
 
         Passes the message to registered subscriber callbacks.
@@ -215,6 +216,16 @@ class MultiSubscriber:
 
         """
         outgoing = OutgoingMessage(msg)
+
+        if verbose:
+            try:
+                sent_time = Time.from_msg(msg.header.stamp)
+                elapsed_time = self.node_handle.get_clock().now() - sent_time
+                self.node_handle.get_logger().info(
+                    f"Message received on topic {self.topic} with {elapsed_time.nanoseconds/1.0e9:.3f} sec delay"
+                )
+            except:
+                pass
 
         with self.rlock:
             callbacks = callbacks or self.subscriptions.values()
